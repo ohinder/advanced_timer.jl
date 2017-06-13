@@ -107,7 +107,9 @@ function print_timer_stats(timer::class_advanced_timer)
     total = timer.grand_total.total
     for label in keys(timer.times)
         this_time = timer.times[label];
-        @assert(!this_time.active)
+        if(this_time.active)
+          error("$label is active, should be inactive!")
+        end
         println( rpad(label, padsize), rpad(show_percent(this_time.total,total), 8), this_time.num_calls)
     end
 
