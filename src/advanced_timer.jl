@@ -1,6 +1,6 @@
 module advanced_timer
 
-export start_advanced_timer, pause_advanced_timer, print_timer_stats, get_elapsed_time, class_advanced_timer
+export start_advanced_timer, pause_advanced_timer, print_timer_stats, get_elapsed_time, class_advanced_timer, merge_timers
 
 type class_timing_info
     start::Float64
