@@ -92,9 +92,9 @@ function show_percent(val,total)
   return string(round_num(100*val/total)) * "%"
 end
 
-function print_timer_stats(timer::class_advanced_timer)
-  heading = "========= Time statistics =========";
-  println(heading)
+function print_timer_stats(stream, timer::class_advanced_timer)
+    heading = "========= Time statistics =========\n";
+    write(stream, heading)
     max_string_length = 0;
     for label in keys(timer.times)
         max_string_length = max(length(label),max_string_length)
@@ -103,22 +103,28 @@ function print_timer_stats(timer::class_advanced_timer)
     padsize =  max_string_length + 3;
 
     # percentage time, number of calls
-    println(rpad("Label",padsize), rpad("Time",8), "#calls")
+    write(stream, rpad("Label",padsize), rpad("Time",8), "#calls", "\n")
     total = timer.grand_total.total
-    for label in keys(timer.times)
+
+    sorted_labels = sort(collect(keys(timer.times)))
+    for label in sorted_labels
         this_time = timer.times[label];
         if(this_time.active)
           error("$label is active, should be inactive!")
         end
-        println( rpad(label, padsize), rpad(show_percent(this_time.total,total), 8), this_time.num_calls)
+        write(stream, rpad(label, padsize), rpad(show_percent(this_time.total,total), 8), "$(this_time.num_calls)", "\n")
     end
 
     # total time
-    println( "Total time (seconds):  ", round_num(total, 3) )
+    rounded_num = round_num(total, 3)
+    write(stream, "Total time (seconds): $rounded_num \n" )
 
-    println(repeat("=",length(heading)))
+    println(stream, repeat("=",length(heading)), "\n")
 end
 
+function print_timer_stats(timer::class_advanced_timer)
+    print_timer_stats(STDOUT, timer)
+end
 
 
 function get_elapsed_time(timer::class_advanced_timer)
@@ -129,8 +135,38 @@ function get_elapsed_time(timer::class_advanced_timer, str::String)
     return elapsed_time(timer.times[str])
 end
 
-function merge_timers(timer1::class_advanced_timer, timer2::class_advanced_timer)
+function merge_timers(timing_info1::class_timing_info, timing_info2::class_timing_info)
+    merged_info = class_timing_info()
+    if timing_info1.active || timing_info2.active
+        error("cannot merge if any timer is active")
+    end
+    merged_info.total = timing_info1.total + timing_info2.total
+    merged_info.num_calls = timing_info1.num_calls + timing_info2.num_calls
+    merged_info.active = false
+    merged_info.start = NaN
 
+    return merged_info
+end
+
+function merge_timers(timer1::class_advanced_timer, timer2::class_advanced_timer)
+    merged_timer = class_advanced_timer()
+    merged_timer.grand_total = merge_timers(timer1.grand_total, timer2.grand_total)
+
+    for label in keys(timer1.times)
+        if label in keys(timer2.times)
+          merged_timer.times[label] = merge_timers(timer1.times[label], timer2.times[label])
+        else
+          merged_timer.times[label] = timer1.times[label]
+        end
+    end
+
+    for label in keys(timer2.times)
+        if !(label in keys(timer1.times))
+          merged_timer.times[label] = timer2.times[label]
+        end
+    end
+
+    return merged_timer
 end
 
 ########################
