@@ -1,11 +1,8 @@
 # advanced timer
 
 Example usage:
-<<<<<<< HEAD
+
 ```julia
-=======
-```
->>>>>>> 3ce23cc2a76cd7ef13b7989cc3582faf73e100f2
 using advanced_timer
 timer = class_advanced_timer();
 start_advanced_timer(timer);
