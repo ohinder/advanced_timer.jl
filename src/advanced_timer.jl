@@ -27,11 +27,11 @@ end
 
 
 function elapsed_time(time_this::class_timing_info)
-    return time_this.total + (time() - time_this.start)
+    return time_this.total + ((Base.time_ns)() * 10^(-9.0) - time_this.start)
 end
 
 function start(time_this::class_timing_info)
-    time_this.start = time();
+    time_this.start = (Base.time_ns)() * 10^(-9.0);
     time_this.active = true;
     time_this.num_calls += 1
 end
