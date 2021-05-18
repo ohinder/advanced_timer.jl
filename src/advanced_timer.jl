@@ -2,7 +2,7 @@ module advanced_timer
 
 export start_advanced_timer, pause_advanced_timer, print_timer_stats, get_elapsed_time, class_advanced_timer, merge_timers
 
-type class_timing_info
+mutable struct class_timing_info
     start::Float64
     total::Float64
     active::Bool
@@ -13,7 +13,7 @@ type class_timing_info
     end
 end
 
-type class_advanced_timer
+mutable struct class_advanced_timer
   grand_total::class_timing_info
 	times::Dict{String,class_timing_info}
 
