@@ -123,7 +123,7 @@ function print_timer_stats(stream, timer::class_advanced_timer)
 end
 
 function print_timer_stats(timer::class_advanced_timer)
-    print_timer_stats(STDOUT, timer)
+    print_timer_stats(stdout, timer)
 end
 
 
